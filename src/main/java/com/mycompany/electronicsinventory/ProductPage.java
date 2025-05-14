@@ -49,7 +49,7 @@ public class ProductPage extends javax.swing.JFrame {
     }
 
 private void Fetch() {
-        try {
+         try {
             int sh;
             dbs = con.prepareStatement("SELECT * FROM product");
             kz = dbs.executeQuery();
@@ -257,6 +257,17 @@ private void Fetch() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+       
+        if (txtPName.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Product Name is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        }else if (txtPrice.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Product Price is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        }else if (txtQty.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Product Quantity is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        }else 
+        
+        
+        
         try {
             // TODO add your handling code here:
             
@@ -285,8 +296,7 @@ private void Fetch() {
         } catch (SQLException ex) {
             Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
+
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
@@ -351,6 +361,16 @@ private void Fetch() {
     }//GEN-LAST:event_btnExportActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        
+        if (txtPName.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Product Name is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        }else if (txtPrice.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Product Price is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        }else if (txtQty.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Product Quantity is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        }else 
+        
+        
         try {
             String pname = txtPName.getText().trim();
             String price = txtPrice.getText().trim();
