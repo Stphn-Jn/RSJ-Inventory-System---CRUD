@@ -97,12 +97,9 @@ private void Fetch() {
         btnAdd = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnExport = new javax.swing.JButton();
-        btnNew = new javax.swing.JButton();
-        btnExport1 = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         btnSearchName = new javax.swing.JToggleButton();
@@ -170,22 +167,6 @@ private void Fetch() {
             }
         });
 
-        btnNew.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        btnNew.setText("New");
-        btnNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNewActionPerformed(evt);
-            }
-        });
-
-        btnExport1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        btnExport1.setText("Export to PDF");
-        btnExport1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExport1ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -198,28 +179,22 @@ private void Fetch() {
                 .addGap(26, 26, 26)
                 .addComponent(btnDelete)
                 .addGap(18, 18, 18)
-                .addComponent(btnNew)
-                .addGap(18, 18, 18)
                 .addComponent(btnExport)
-                .addGap(18, 18, 18)
-                .addComponent(btnExport1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnUpdate)
                     .addComponent(btnAdd)
                     .addComponent(btnDelete)
-                    .addComponent(btnNew)
-                    .addComponent(btnExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnExport1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnExport, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 730, 40));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 540, 40));
 
         btnSearch.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnSearch.setText("Search ID");
@@ -244,19 +219,6 @@ private void Fetch() {
         jScrollPane1.setViewportView(jTable1);
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 230, 650, 450));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 20, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 20, Short.MAX_VALUE)
-        );
-
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 10, 20, 20));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -351,6 +313,41 @@ private void Fetch() {
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         // TODO add your handling code here:
+        String filename = "C:\\Users\\Administrator\\Documents\\ISE\\ExportedFile.csv";
+        
+        try {
+            FileWriter fw = new FileWriter(filename);
+            dbs = con.prepareStatement("SELECT * FROM product");
+            kz = dbs.executeQuery();
+            
+            while (kz.next()) {
+                fw.append(kz.getString(1));
+                fw.append(',');
+                fw.append(kz.getString(2));
+                fw.append(',');
+                fw.append(kz.getString(3));
+                fw.append(',');
+                fw.append(kz.getString(4));
+                fw.append('\n');
+            }
+            JOptionPane.showMessageDialog(this, "File Has Been Exported as CSV");
+            fw.flush();
+            fw.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }//GEN-LAST:event_btnExportActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
@@ -427,14 +424,6 @@ private void Fetch() {
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
-    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnNewActionPerformed
-
-    private void btnExport1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExport1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnExport1ActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -475,8 +464,6 @@ private void Fetch() {
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnExport;
-    private javax.swing.JButton btnExport1;
-    private javax.swing.JButton btnNew;
     private javax.swing.JButton btnSearch;
     private javax.swing.JToggleButton btnSearchName;
     private javax.swing.JButton btnUpdate;
@@ -486,7 +473,6 @@ private void Fetch() {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
