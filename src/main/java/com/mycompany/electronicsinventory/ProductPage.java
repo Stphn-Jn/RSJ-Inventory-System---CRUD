@@ -15,9 +15,10 @@ public class ProductPage extends javax.swing.JFrame {
     PreparedStatement dbs;
 
     public ProductPage() {
-        initComponents();
+        initComponents();        
         Connect(); // Call Connect() here to initialize the DB connection
         LoadProductNo();
+        disableTableEditingAndClicking();
         Fetch();
         
     }
@@ -75,6 +76,47 @@ private void Fetch() {
         }
 }
 
+
+private void disableTableEditingAndClicking() {
+    javax.swing.table.TableModel currentModel = jTable1.getModel();
+
+    javax.swing.table.DefaultTableModel nonEditableModel = new javax.swing.table.DefaultTableModel(
+        getTableData(currentModel),
+        getColumnNames(currentModel)
+    ) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+
+    jTable1.setModel(nonEditableModel);
+
+    jTable1.setRowSelectionAllowed(false);
+    jTable1.setColumnSelectionAllowed(false);
+    jTable1.setCellSelectionEnabled(false);
+}
+
+private Object[][] getTableData(javax.swing.table.TableModel model) {
+    int rowCount = model.getRowCount();
+    int colCount = model.getColumnCount();
+    Object[][] data = new Object[rowCount][colCount];
+    for (int i = 0; i < rowCount; i++) {
+        for (int j = 0; j < colCount; j++) {
+            data[i][j] = model.getValueAt(i, j);
+        }
+    }
+    return data;
+}
+
+private Object[] getColumnNames(javax.swing.table.TableModel model) {
+    int colCount = model.getColumnCount();
+    Object[] columnNames = new Object[colCount];
+    for (int i = 0; i < colCount; i++) {
+        columnNames[i] = model.getColumnName(i);
+    }
+    return columnNames;
+}
 
 
 
