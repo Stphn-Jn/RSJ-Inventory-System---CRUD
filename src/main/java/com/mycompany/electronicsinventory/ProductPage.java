@@ -119,6 +119,36 @@ private Object[] getColumnNames(javax.swing.table.TableModel model) {
 }
 
 
+private void searchProductByName(String keyword) {
+    DefaultTableModel model = new DefaultTableModel(
+        new String[]{"id", "pname", "price", "qty"}, 0);
+
+    String query = "SELECT * FROM product WHERE pname LIKE ?";
+
+    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/rsjess", "root", "");
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+        stmt.setString(1, "%" + keyword + "%");
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Object[] row = {
+                    rs.getInt("id"),
+                    rs.getString("pname"),
+                    rs.getDouble("price"),
+                    rs.getInt("qty")
+                };
+                model.addRow(row);
+            }
+        }
+
+        jTable1.setModel(model);
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
 
 
             
@@ -453,6 +483,8 @@ private Object[] getColumnNames(javax.swing.table.TableModel model) {
 
     private void btnSearchNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchNameActionPerformed
         // TODO add your handling code here:
+        String keyword = txtPP.getText().trim();
+        searchProductByName(keyword);
     }//GEN-LAST:event_btnSearchNameActionPerformed
 
     private void txtPPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPPActionPerformed
