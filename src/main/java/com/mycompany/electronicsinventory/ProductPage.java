@@ -8,6 +8,10 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.io.FileFilter;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 
 public class ProductPage extends javax.swing.JFrame {
 
@@ -21,11 +25,87 @@ public class ProductPage extends javax.swing.JFrame {
         disableTableEditingAndClicking(); // jTable Editing and Clicking Disabled
         btnSearchName.setVisible(true);
         btnClearSearch.setVisible(false);
+        applyInputFilters();
         Fetch();
         
     }
     ResultSet kz;
+    private void applyInputFilters() {
+        // Your DocumentFilter code here, e.g.:
+        ((AbstractDocument) txtPName.getDocument()).setDocumentFilter(new DocumentFilter() {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            if (string.matches("[a-zA-Z0-9 ]*")) {
+               super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            if (text.matches("[a-zA-Z0-9 ]*")) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+    });
+
+    // For Price: allow digits and dot only (to allow decimals)
+    ((AbstractDocument) txtPrice.getDocument()).setDocumentFilter(new DocumentFilter() {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            if (string.matches("[0-9.]*")) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            if (text.matches("[0-9.]*")) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+    });
+
+    // For Quantity: allow digits only (no dots)
+    ((AbstractDocument) txtQty.getDocument()).setDocumentFilter(new DocumentFilter() {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            if (string.matches("[0-9]*")) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            if (text.matches("[0-9]*")) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+    });
+
+        ((AbstractDocument) txtPName.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                if (string.matches("[a-zA-Z0-9 ]*")) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (text.matches("[a-zA-Z0-9 ]*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        });
+
+        // Repeat similarly for txtPrice and txtQty...
+    }
+
+    // Rest of your code...
+   
     
+    
+
     
     public void Connect() {
         try {
@@ -234,6 +314,12 @@ private void loadAllProducts() {
         getContentPane().add(txtpID, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 40, 130, 30));
         getContentPane().add(txtQty, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 120, 160, 30));
         getContentPane().add(txtPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 80, 180, 30));
+
+        txtPName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPNameActionPerformed(evt);
+            }
+        });
         getContentPane().add(txtPName, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 40, 180, 30));
 
         btnUpdate.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -261,7 +347,7 @@ private void loadAllProducts() {
         });
 
         btnExport.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        btnExport.setText("Export to CSV");
+        btnExport.setText("Export to Excel");
         btnExport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExportActionPerformed(evt);
@@ -281,7 +367,7 @@ private void loadAllProducts() {
                 .addComponent(btnDelete)
                 .addGap(18, 18, 18)
                 .addComponent(btnExport)
-                .addContainerGap(134, Short.MAX_VALUE))
+                .addContainerGap(128, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -367,45 +453,69 @@ private void loadAllProducts() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-       
         if (txtPName.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Product Name is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
-        }else if (txtPrice.getText().isEmpty()){
+        } else if (!txtPName.getText().matches("[a-zA-Z0-9 ]+")) {
+            JOptionPane.showMessageDialog(this, "Product Name must not contain symbols!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        } else if (txtPrice.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Product Price is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
-        }else if (txtQty.getText().isEmpty()){
+        } else if (!txtPrice.getText().matches("\\d+(\\.\\d+)?")) {
+            JOptionPane.showMessageDialog(this, "Product Price must be a valid number!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        } else if (txtQty.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Product Quantity is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
-        }else 
-        
-        
-        
-        try {
-            // TODO add your handling code here:
-            
-            String pname = txtPName.getText();
-            String price = txtPrice.getText();
-            String qty = txtQty.getText();
-            String pid = txtpID.getSelectedItem().toString();
-            
-            dbs = con.prepareStatement("UPDATE product SET pname=?,price=?,qty=? WHERE id=?");
-            
-            dbs.setString(1,pname);
-            dbs.setString(2,price);
-            dbs.setString(3,qty);
-            dbs.setString(4,pid);
-            
-            int k = dbs.executeUpdate();
-            if (k==1) {
-                JOptionPane.showMessageDialog(this, "Record has been successfully updated");
-                txtPName.setText("");
-                txtPrice.setText("");
-                txtQty.setText("");
-                txtPName.requestFocus();
-                Fetch();
-                LoadProductNo();
+        } else if (!txtQty.getText().matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "Product Quantity must be a valid integer!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        } else {
+            String inputName = txtPName.getText().trim();
+            String pid = txtpID.getSelectedItem().toString();  // Current product ID
+
+            try {
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/rsjess", "root", "");
+
+                // Check for duplicate name excluding current product
+                String checkSql = "SELECT COUNT(*) FROM product WHERE LOWER(pname) = LOWER(?) AND id <> ?";
+                PreparedStatement checkStmt = con.prepareStatement(checkSql);
+                checkStmt.setString(1, inputName);
+                checkStmt.setString(2, pid);
+                ResultSet rs = checkStmt.executeQuery();
+                rs.next();
+                int count = rs.getInt(1);
+
+                if (count > 0) {
+                    JOptionPane.showMessageDialog(this, "A product with the same name already exists!", "Duplicate Product", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // Perform the update
+                    String updateSql = "UPDATE product SET pname=?, price=?, qty=? WHERE id=?";
+                    PreparedStatement updateStmt = con.prepareStatement(updateSql);
+                    updateStmt.setString(1, inputName);
+                    updateStmt.setDouble(2, Double.parseDouble(txtPrice.getText()));
+                    updateStmt.setInt(3, Integer.parseInt(txtQty.getText()));
+                    updateStmt.setString(4, pid);
+
+                    int updated = updateStmt.executeUpdate();
+                    if (updated == 1) {
+                        JOptionPane.showMessageDialog(this, "Record has been successfully updated");
+                        txtPName.setText("");
+                        txtPrice.setText("");
+                        txtQty.setText("");
+                        txtPName.requestFocus();
+                        Fetch();       // refresh the product table/view
+                        LoadProductNo(); // reload product numbers or IDs
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Update failed: No record found with this ID", "Update Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    updateStmt.close();
+                }
+
+                rs.close();
+                checkStmt.close();
+                con.close();
+
+            } catch (SQLException ex) {
+                Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this, "Database Error: " + ex.getMessage());
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+}
 
     }//GEN-LAST:event_btnUpdateActionPerformed
 
@@ -434,85 +544,101 @@ private void loadAllProducts() {
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         // TODO add your handling code here:
         String filename = "C:\\Users\\Administrator\\Documents\\ISE\\ExportedFile.csv";
-        
+
         try {
             FileWriter fw = new FileWriter(filename);
+
+            // Write CSV header first
+             fw.append("id,product name,price,qty\n");
+
             dbs = con.prepareStatement("SELECT * FROM product");
             kz = dbs.executeQuery();
-            
+
             while (kz.next()) {
-                fw.append(kz.getString(1));
+                fw.append(kz.getString(1)); // id
                 fw.append(',');
-                fw.append(kz.getString(2));
+                fw.append(kz.getString(2)); // product name
                 fw.append(',');
-                fw.append(kz.getString(3));
+                fw.append(kz.getString(3)); // price
                 fw.append(',');
-                fw.append(kz.getString(4));
+                fw.append(kz.getString(4)); // qty
                 fw.append('\n');
             }
-            JOptionPane.showMessageDialog(this, "File Has Been Exported as CSV");
+
             fw.flush();
             fw.close();
-        } catch (IOException ex) {
+
+            JOptionPane.showMessageDialog(this, "File Has Been Exported as XLSX");
+
+        } catch (IOException | SQLException ex) {
             Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+            JOptionPane.showMessageDialog(this, "Error exporting file: " + ex.getMessage());
+        }      
     }//GEN-LAST:event_btnExportActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        
+        //
         if (txtPName.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Product Name is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
-        }else if (txtPrice.getText().isEmpty()){
+        } else if (!txtPName.getText().matches("[a-zA-Z0-9 ]+")) {
+            JOptionPane.showMessageDialog(this, "Product Name must not contain symbols!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        } else if (txtPrice.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Product Price is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
-        }else if (txtQty.getText().isEmpty()){
+        } else if (!txtPrice.getText().matches("\\d+(\\.\\d+)?")) {
+            JOptionPane.showMessageDialog(this, "Product Price must be a valid number!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        } else if (txtQty.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Product Quantity is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
-        }else 
-        
-        
-        try {
-            String pname = txtPName.getText().trim();
-            String price = txtPrice.getText().trim();
-            String qty = txtQty.getText().trim();
+        } else if (!txtQty.getText().matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "Product Quantity must be a valid integer!", "Input Error", JOptionPane.WARNING_MESSAGE);
+        } else {
+            String inputName = txtPName.getText().trim();
 
-            if (pname.isEmpty() || price.isEmpty() || qty.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Input Error", JOptionPane.WARNING_MESSAGE);
-                return;
+            try {
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/rsjess", "root", "");
+
+                // Check for duplicate (case-insensitive)
+                String checkSql = "SELECT COUNT(*) FROM product WHERE LOWER(pname) = LOWER(?)";
+                PreparedStatement checkStmt = con.prepareStatement(checkSql);
+                checkStmt.setString(1, inputName);
+                ResultSet rs = checkStmt.executeQuery();
+                rs.next();
+                int count = rs.getInt(1);
+
+                if (count > 0) {
+                    JOptionPane.showMessageDialog(this, "A product with the same name already exists!", "Duplicate Product", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // Insert product
+                    String insertSql = "INSERT INTO product (pname, price, qty) VALUES (?, ?, ?)";
+                    PreparedStatement insertStmt = con.prepareStatement(insertSql);
+                    insertStmt.setString(1, inputName);
+                    insertStmt.setDouble(2, Double.parseDouble(txtPrice.getText()));
+                    insertStmt.setInt(3, Integer.parseInt(txtQty.getText()));
+                    insertStmt.executeUpdate();
+
+                    JOptionPane.showMessageDialog(this, "Product added successfully!");
+
+                    // Clear fields
+                    txtPName.setText("");
+                    txtPrice.setText("");
+                    txtQty.setText("");
+                    txtPName.requestFocus();
+
+                    // Optional: refresh table
+                    Fetch();        // If you have a function to reload the table
+                    LoadProductNo(); // If you use this to update product numbering
+
+                    insertStmt.close();
+                }
+
+                rs.close();
+                checkStmt.close();
+                con.close();
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
             }
-
-            dbs = con.prepareStatement("INSERT INTO product (pname, price, qty) VALUES (?, ?, ?)");
-            dbs.setString(1, pname);
-            dbs.setString(2, price);
-            dbs.setString(3, qty);
-
-            int k = dbs.executeUpdate();
-
-            if (k == 1) {
-                JOptionPane.showMessageDialog(this, "Record Added Successfully");
-                txtPName.setText("");
-                txtPrice.setText("");
-                txtQty.setText("");
-                txtPName.requestFocus();
-                Fetch();
-                LoadProductNo();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to Add Record");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "SQL Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void txtpIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtpIDActionPerformed
@@ -578,6 +704,10 @@ private void loadAllProducts() {
         btnClearSearch.setVisible(false);
         btnSearchName.setVisible(true);
     }//GEN-LAST:event_btnClearSearchActionPerformed
+
+    private void txtPNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPNameActionPerformed
 
     /**
      * @param args the command line arguments
