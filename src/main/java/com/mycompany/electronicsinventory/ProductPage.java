@@ -18,7 +18,9 @@ public class ProductPage extends javax.swing.JFrame {
         initComponents();        
         Connect(); // Call Connect() here to initialize the DB connection
         LoadProductNo();
-        disableTableEditingAndClicking();
+        disableTableEditingAndClicking(); // jTable Editing and Clicking Disabled
+        btnSearchName.setVisible(true);
+        btnClearSearch.setVisible(false);
         Fetch();
         
     }
@@ -150,6 +152,32 @@ private void searchProductByName(String keyword) {
     }
 }
 
+private void loadAllProducts() {
+    DefaultTableModel model = new DefaultTableModel(
+        new String[]{"id", "pname", "price", "qty"}, 0);
+
+    String query = "SELECT * FROM product";
+
+    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/rsjess", "root", "");
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(query)) {
+
+        while (rs.next()) {
+            Object[] row = {
+                rs.getInt("id"),
+                rs.getString("pname"),
+                rs.getDouble("price"),
+                rs.getInt("qty")
+            };
+            model.addRow(row);
+        }
+
+        jTable1.setModel(model);
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+}
 
             
     @SuppressWarnings("unchecked")
@@ -176,6 +204,7 @@ private void searchProductByName(String keyword) {
         jLabel5 = new javax.swing.JLabel();
         btnSearchName = new javax.swing.JToggleButton();
         txtPP = new javax.swing.JTextField();
+        btnClearSearch = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -252,7 +281,7 @@ private void searchProductByName(String keyword) {
                 .addComponent(btnDelete)
                 .addGap(18, 18, 18)
                 .addComponent(btnExport)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addContainerGap(134, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -266,7 +295,7 @@ private void searchProductByName(String keyword) {
                 .addContainerGap())
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 540, 40));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 610, 40));
 
         btnSearch.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnSearch.setText("Search ID");
@@ -324,6 +353,15 @@ private void searchProductByName(String keyword) {
             }
         });
         getContentPane().add(txtPP, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 90, 130, 30));
+
+        btnClearSearch.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnClearSearch.setText("Clear Search");
+        btnClearSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearSearchActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnClearSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 130, 120, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -484,11 +522,24 @@ private void searchProductByName(String keyword) {
     private void btnSearchNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchNameActionPerformed
         // TODO add your handling code here:
         String keyword = txtPP.getText().trim();
+
+        if (keyword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a product name to search.");
+            return;
+        }
+
         searchProductByName(keyword);
+
+        // Transition buttons
+        btnSearchName.setVisible(false);
+        btnClearSearch.setVisible(true);
+        
     }//GEN-LAST:event_btnSearchNameActionPerformed
 
     private void txtPPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPPActionPerformed
         // TODO add your handling code here:
+        // Trigger the search
+        btnSearchName.doClick(); // Simulates clicking the search button
     }//GEN-LAST:event_txtPPActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
@@ -517,6 +568,16 @@ private void searchProductByName(String keyword) {
             Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnClearSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearSearchActionPerformed
+        // TODO add your handling code here:
+        txtPP.setText("");
+        loadAllProducts(); // Reload all data
+
+        // Transition buttons
+        btnClearSearch.setVisible(false);
+        btnSearchName.setVisible(true);
+    }//GEN-LAST:event_btnClearSearchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -556,6 +617,7 @@ private void searchProductByName(String keyword) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnClearSearch;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnExport;
     private javax.swing.JButton btnSearch;
