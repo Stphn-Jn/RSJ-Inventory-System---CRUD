@@ -4,6 +4,8 @@
  */
 package com.mycompany.electronicsinventory;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -31,6 +33,13 @@ public class LoginForm extends javax.swing.JFrame {
     public LoginForm() {
         initComponents();
         connectDatabase();
+        
+        txtPassword.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            btnLogin.doClick(); // Trigger the login button
+        }
+    });
     }
 
     
@@ -127,27 +136,36 @@ public class LoginForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        // TODO add your handling code here:
         String user = txtUsername.getText();
         String pass = new String(txtPassword.getPassword());
+        boolean found = false;
+
         try {
-                       
+            //
             dbs = con.prepareStatement("SELECT * FROM ustbl");
-            
             kz = dbs.executeQuery();
-            while(kz.next()) {
-                String uname = kz.getString("username");
-                String pword = kz.getString("password");
-                
-                if ((user.equals(uname)) && (pass.equals(pword))) {
-                    new ProductPage().setVisible(true);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Wrong Credentials, Please try again!!!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+
+        while (kz.next()) {
+            String uname = kz.getString("username");
+            String pword = kz.getString("password");
+
+        if (user.equals(uname) && pass.equals(pword)) {
+            found = true;
+            break;
         }
+    }
+
+    if (found) {
+        new ProductPage().setVisible(true);
+        this.setVisible(false);  // ✅ Hides the current LoginForm
+    } else {
+        JOptionPane.showMessageDialog(this, "Wrong Credentials, Please try again!!!", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+} catch (SQLException ex) {
+    Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+}
+
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed

@@ -142,7 +142,29 @@ private Object[] getColumnNames(javax.swing.table.TableModel model) {
     }
 
     // Rest of your code...
-   
+private void loadProducts() {
+    try {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0); // Clear existing rows
+
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM product");
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            int id = rs.getInt("product_id");        // Adjust to match your DB column
+            String name = rs.getString("product_name");
+            int qty = rs.getInt("quantity");
+            double price = rs.getDouble("price");
+
+            model.addRow(new Object[] { id, name, qty, price });
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Failed to load products.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+  
     
     
 
@@ -278,6 +300,7 @@ private void loadAllProducts() {
         btnAdd = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnExport = new javax.swing.JButton();
+        btnBatchDel = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
@@ -325,6 +348,7 @@ private void loadAllProducts() {
 
         btnUpdate.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btnUpdate.setText("Update");
+        btnUpdate.setPreferredSize(new java.awt.Dimension(100, 30));
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUpdateActionPerformed(evt);
@@ -341,6 +365,7 @@ private void loadAllProducts() {
 
         btnDelete.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btnDelete.setText("Delete");
+        btnDelete.setPreferredSize(new java.awt.Dimension(90, 30));
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteActionPerformed(evt);
@@ -349,9 +374,21 @@ private void loadAllProducts() {
 
         btnExport.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnExport.setText("Export to Excel");
+        btnExport.setPreferredSize(new java.awt.Dimension(130, 30));
         btnExport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExportActionPerformed(evt);
+            }
+        });
+
+        btnBatchDel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        btnBatchDel.setText("Batch Delete");
+        btnBatchDel.setEnabled(false);
+        btnBatchDel.setHideActionText(true);
+        btnBatchDel.setPreferredSize(new java.awt.Dimension(90, 30));
+        btnBatchDel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBatchDelActionPerformed(evt);
             }
         });
 
@@ -363,26 +400,29 @@ private void loadAllProducts() {
                 .addGap(21, 21, 21)
                 .addComponent(btnAdd)
                 .addGap(27, 27, 27)
-                .addComponent(btnUpdate)
+                .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(26, 26, 26)
-                .addComponent(btnDelete)
+                .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnExport)
-                .addContainerGap(128, Short.MAX_VALUE))
+                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                .addComponent(btnBatchDel, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnUpdate)
+                    .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAdd)
-                    .addComponent(btnDelete)
-                    .addComponent(btnExport, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnBatchDel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 610, 40));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, 660, 60));
 
         btnSearch.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnSearch.setText("Search ID");
@@ -711,6 +751,55 @@ private void loadAllProducts() {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtPNameActionPerformed
 
+    private void btnBatchDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatchDelActionPerformed
+            // TODO add your handling code here:
+        
+    int[] selectedRows = jTable1.getSelectedRows();
+
+    if (selectedRows.length == 0) {
+        JOptionPane.showMessageDialog(this, "No products selected.", "Warning", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    int confirm = JOptionPane.showConfirmDialog(this, 
+        "Are you sure you want to delete the selected products?", 
+        "Confirm Deletion", 
+        JOptionPane.YES_NO_OPTION);
+
+    if (confirm != JOptionPane.YES_OPTION) {
+        return;
+    }
+
+    try {
+        con = DBConnection.getConnection(); 
+        con.setAutoCommit(false);
+
+        String sql = "DELETE FROM product WHERE product_id = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+
+        for (int row : selectedRows) {
+            Object value = jTable1.getValueAt(row, 0); // Assuming product_id is in column 0
+            if (value != null) {
+                ps.setInt(1, Integer.parseInt(value.toString()));
+                ps.addBatch();
+            }
+        }
+
+        ps.executeBatch();
+        con.commit();
+
+        JOptionPane.showMessageDialog(this, "Selected products deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        loadProducts(); // Refresh table after deletion
+
+    } catch (Exception ex) {
+        try { if (con != null) con.rollback(); } catch (SQLException e) { e.printStackTrace(); }
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error deleting products.", "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        try { if (con != null) con.setAutoCommit(true); } catch (SQLException e) { e.printStackTrace(); }
+    }
+    }//GEN-LAST:event_btnBatchDelActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -749,6 +838,7 @@ private void loadAllProducts() {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnBatchDel;
     private javax.swing.JButton btnClearSearch;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnExport;
