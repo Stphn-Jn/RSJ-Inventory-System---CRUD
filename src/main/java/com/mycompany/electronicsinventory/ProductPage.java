@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
-import java.io.FileFilter;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.AttributeSet;
@@ -30,6 +29,47 @@ public class ProductPage extends javax.swing.JFrame {
         
     }
     ResultSet kz;
+    
+    private void disableTableEditingAndClicking() {
+    javax.swing.table.TableModel currentModel = jTable1.getModel();
+
+    javax.swing.table.DefaultTableModel nonEditableModel = new javax.swing.table.DefaultTableModel(
+        getTableData(currentModel),
+        getColumnNames(currentModel)
+    ) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+
+    jTable1.setModel(nonEditableModel);
+
+    jTable1.setRowSelectionAllowed(false);
+    jTable1.setColumnSelectionAllowed(false);
+    jTable1.setCellSelectionEnabled(false);
+}
+
+private Object[][] getTableData(javax.swing.table.TableModel model) {
+    int rowCount = model.getRowCount();
+    int colCount = model.getColumnCount();
+    Object[][] data = new Object[rowCount][colCount];
+    for (int i = 0; i < rowCount; i++) {
+        for (int j = 0; j < colCount; j++) {
+            data[i][j] = model.getValueAt(i, j);
+        }
+    }
+    return data;
+}
+
+private Object[] getColumnNames(javax.swing.table.TableModel model) {
+    int colCount = model.getColumnCount();
+    Object[] columnNames = new Object[colCount];
+    for (int i = 0; i < colCount; i++) {
+        columnNames[i] = model.getColumnName(i);
+    }
+    return columnNames;
+}
     private void applyInputFilters() {
         // Your DocumentFilter code here, e.g.:
         ((AbstractDocument) txtPName.getDocument()).setDocumentFilter(new DocumentFilter() {
@@ -159,46 +199,7 @@ private void Fetch() {
 }
 
 
-private void disableTableEditingAndClicking() {
-    javax.swing.table.TableModel currentModel = jTable1.getModel();
 
-    javax.swing.table.DefaultTableModel nonEditableModel = new javax.swing.table.DefaultTableModel(
-        getTableData(currentModel),
-        getColumnNames(currentModel)
-    ) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-    };
-
-    jTable1.setModel(nonEditableModel);
-
-    jTable1.setRowSelectionAllowed(false);
-    jTable1.setColumnSelectionAllowed(false);
-    jTable1.setCellSelectionEnabled(false);
-}
-
-private Object[][] getTableData(javax.swing.table.TableModel model) {
-    int rowCount = model.getRowCount();
-    int colCount = model.getColumnCount();
-    Object[][] data = new Object[rowCount][colCount];
-    for (int i = 0; i < rowCount; i++) {
-        for (int j = 0; j < colCount; j++) {
-            data[i][j] = model.getValueAt(i, j);
-        }
-    }
-    return data;
-}
-
-private Object[] getColumnNames(javax.swing.table.TableModel model) {
-    int colCount = model.getColumnCount();
-    Object[] columnNames = new Object[colCount];
-    for (int i = 0; i < colCount; i++) {
-        columnNames[i] = model.getColumnName(i);
-    }
-    return columnNames;
-}
 
 
 private void searchProductByName(String keyword) {
@@ -450,6 +451,7 @@ private void loadAllProducts() {
         getContentPane().add(btnClearSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 130, 120, -1));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
@@ -548,7 +550,7 @@ private void loadAllProducts() {
         try {
             FileWriter fw = new FileWriter(filename);
 
-            // Write CSV header first
+            // CSV Header
              fw.append("id,product name,price,qty\n");
 
             dbs = con.prepareStatement("SELECT * FROM product");
@@ -568,7 +570,7 @@ private void loadAllProducts() {
             fw.flush();
             fw.close();
 
-            JOptionPane.showMessageDialog(this, "File Has Been Exported as XLSX");
+            JOptionPane.showMessageDialog(this, "File Has Been Exported as CSV");
 
         } catch (IOException | SQLException ex) {
             Logger.getLogger(ProductPage.class.getName()).log(Level.SEVERE, null, ex);
@@ -577,7 +579,7 @@ private void loadAllProducts() {
     }//GEN-LAST:event_btnExportActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        //
+        // TODO add your handling code here:
         if (txtPName.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Product Name is Required!", "Input Error", JOptionPane.WARNING_MESSAGE);
         } else if (!txtPName.getText().matches("[a-zA-Z0-9 ]+")) {
@@ -740,7 +742,7 @@ private void loadAllProducts() {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new ProductPage().setVisible(true);
+                new LoginForm().setVisible(true);
             }
         });
     }
